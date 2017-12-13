@@ -1,0 +1,21 @@
+{
+    "name": "adamaveray/slim-extensions",
+    "description": "A handful of custom extensions to Slim",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Averay",
+            "email": "adam@averay.com"
+        }
+    ],
+    "require": {
+        "slim/slim": "^3.9",
+        "zeuxisoo/slim-whoops": "^0.6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "AdamAveray\\SlimExtensions\\": "src/"
+        }
+    }
+}
