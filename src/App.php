@@ -42,11 +42,10 @@ class App extends \Slim\App {
 				// Remove original PrettyPageHandler
 				/** @var WhoopsPrettyPageHandler $legacyHandler */
 				$legacyHandler = array_shift($handlers);
-			}
 
-			// Import editor links
-			if(isset($legacyHandler)){
-				$container['settings']['whoops.editor'] = [$legacyHandler, 'getEditorHref'];
+				// Import settings
+				$container['settings']['whoops.editor']		= [$legacyHandler, 'getEditorHref'];
+				$container['settings']['whoops.pageTitle']	= $legacyHandler->getPageTitle();
 			}
 		}
 
