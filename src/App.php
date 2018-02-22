@@ -1,7 +1,9 @@
 <?php
 namespace AdamAveray\SlimExtensions;
 
+use Psr\Container\ContainerExceptionInterface;
 use Slim\Exception\NotFoundException as SlimNotFoundException;
+use Slim\Interfaces\RouteInterface;
 use Slim\Http\Headers;
 use Slim\Http\Request as BaseRequest;
 use Slim\Http\Response as BaseResponse;
@@ -25,6 +27,13 @@ class App extends \Slim\App {
 	private function getInitialSettings(array $settings){
 		if(defined('IS_DEBUG')){
 			$settings['debug'] = IS_DEBUG;
+		}
+
+		if(!isset($settings['patternValidator'])){
+			$settings['patternValidator'] = function($pattern) {
+				// Must end with trailing slash or contain extension (not both)
+				return (substr($pattern, -1) === '/') xor (strpos($pattern, '.') !== false);
+			};
 		}
 
 		return $settings;
@@ -83,10 +92,21 @@ class App extends \Slim\App {
 	 * @param string|string[] $patterns One or more route URI patterns
 	 * @param callable|string $callable The route callback routine
 	 * @return RouteInterface|RouteInterface[]
+	 * @throws \InvalidArgumentException A pattern does not pass the defined pattern validator
 	 */
 	public function map(array $methods, $patterns, $callable){
+		try {
+			$validator = $this->getContainer()->get('patternValidator');
+		} catch(ContainerExceptionInterface $e){
+			$validator = null;
+		}
+
 		$routes	= [];
 		foreach((array)$patterns as $i => $pattern){
+			if($validator !== null && !$validator($pattern)){
+				throw new \InvalidArgumentException('Pattern is invalid ('.$pattern.')');
+			}
+
 			$routes[$i] = parent::map($methods, $pattern, $callable);
 		}
 
