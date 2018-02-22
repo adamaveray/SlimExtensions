@@ -1,8 +1,6 @@
 <?php
 namespace AdamAveray\SlimExtensions\Http;
 
-use Slim\Http\Body;
-
 class Response extends \Slim\Http\Response {
 	private $isDebug = false;
 
