@@ -62,15 +62,18 @@ class App extends \Slim\App {
 				$container['settings']['whoops.pageTitle']	= $legacyHandler->getPageTitle();
 			}
 
-			// Setup error handlers
-			$handler = function($container) {
-				return new WhoopsErrorHandler($container->get('whoops'));
-			};
-			if (!isset($container['errorHandler'])) {
-				$container['errorHandler'] = $handler;
-			}
-			if (!isset($container['phpErrorHandler'])) {
-				$container['phpErrorHandler'] = $handler;
+			if($container['settings']['debug']){
+				// Setup error handlers
+				$handler = function($container){
+					return new WhoopsErrorHandler($container->get('whoops'));
+				};
+
+				if(!isset($container['errorHandler'])){
+					$container['errorHandler'] = $handler;
+				}
+				if(!isset($container['phpErrorHandler'])){
+					$container['phpErrorHandler'] = $handler;
+				}
 			}
 		}
 
