@@ -79,6 +79,27 @@ class App extends \Slim\App {
 	}
 
 	/**
+	 * @param string[] $methods Numeric array of HTTP method names
+	 * @param string|string[] $patterns One or more route URI patterns
+	 * @param callable|string $callable The route callback routine
+	 * @return RouteInterface|RouteInterface[]
+	 */
+	public function map(array $methods, $patterns, $callable){
+		$routes	= [];
+		foreach((array)$patterns as $i => $pattern){
+			$routes[$i] = parent::map($methods, $pattern, $callable);
+		}
+
+		if(is_array($patterns)){
+			// Multiple patterns provided - return all routes
+			return $routes;
+		} else {
+			// Only single pattern provided - return single route
+			return current($routes);
+		}
+	}
+
+	/**
 	 * @param string $message
 	 * @param BaseRequest|null $request
 	 * @param BaseResponse|null $response
