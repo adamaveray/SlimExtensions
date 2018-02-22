@@ -2,6 +2,7 @@
 namespace AdamAveray\SlimExtensions;
 
 use Psr\Container\ContainerExceptionInterface;
+use Slim\Exception\SlimException;
 use Slim\Exception\NotFoundException as SlimNotFoundException;
 use Slim\Interfaces\RouteInterface;
 use Slim\Http\Headers;
@@ -126,18 +127,77 @@ class App extends \Slim\App {
 	 * @throws SlimNotFoundException
 	 */
 	public function notFound($message, BaseRequest $request = null, BaseResponse $response = null){
-		$container = $this->getContainer();
-		if(!isset($request)){
-			$request = $container['request'];
+		$this->fallbackObjects($request, $response);
+
+		/** @var SlimNotFoundException $e */
+		$e = $this->injectException(new SlimNotFoundException($request, $response), $message);
+		throw $e;
+	}
+
+	/**
+	 * @param string|\Exception $messageOrException
+	 * @param int $status
+	 * @param BaseRequest|null $request
+	 * @param BaseResponse|null $response
+	 * @throws SlimException
+	 */
+	public function error($messageOrException, $status = 500, BaseRequest $request = null, BaseResponse $response = null){
+		$this->fallbackObjects($request, $response);
+
+		// Set status
+		$response = $response->withStatus($status);
+
+		$message	= null;
+		$previous	= null;
+		if($messageOrException instanceof \Exception){
+			$previous	= $messageOrException;
+		} else {
+			$message	= $messageOrException;
 		}
-		if(!isset($response)){
-			$response = $container['response'];
+		/** @var SlimException $e */
+		$e = $this->injectException(new SlimException($request, $response), $message, $previous);
+		throw $e;
+	}
+
+	/**
+	 * Overwrite the given values in an existing Exception object
+	 *
+	 * @param \Exception $e             The exception to overwrite values in
+	 * @param string|null $message      The `->message` value to overwrite, or null to preserve existing
+	 * @param \Exception|null $previous The `->previous` value to overwrite, or null to preserve existing
+	 * @return \Exception The Exception provided as $e
+	 */
+	private function injectException(\Exception $e, $message = null, \Exception $previous = null){
+		$mirror = new \ReflectionClass($e);
+
+		$values	= [
+			'message'	=> $message,
+			'previous'	=> $previous,
+		];
+		foreach($values as $propertyName => $value){
+			if($value === null){
+				continue;
+			}
+
+			$property	= $mirror->getProperty($propertyName);
+			$property->setAccessible(true);
+			$property->setValue($e, $value);
 		}
 
-		$e = new SlimNotFoundException($request, $response);
-		$property = new \ReflectionProperty($e, 'message');
-		$property->setAccessible(true);
-		$property->setValue($e, $message);
-		throw $e;
+		return $e;
+	}
+
+	/**
+	 * @param BaseRequest|null &$request	Will be set by reference to a generic Request instance if null
+	 * @param BaseResponse|null &$response	Will be set by reference to a generic Response instance if null
+	 */
+	private function fallbackObjects(BaseRequest &$request = null, BaseResponse &$response = null){
+		$container = $this->getContainer();
+		if($request === null){
+			$request = $container['request'];
+		}
+		if($response === null){
+			$response = $container['response'];
+		}
 	}
 }
