@@ -47,4 +47,14 @@ class Response extends \Slim\Http\Response {
 
 		return parent::withJson($data, $status, $encodingOptions);
 	}
+
+	/**
+	 * Return an instance with the specified string as the body
+	 *
+	 * @param string $string
+	 * @return static
+	 */
+	public function withBodyString($string){
+		return $this->withBody(new Body($string));
+	}
 }
