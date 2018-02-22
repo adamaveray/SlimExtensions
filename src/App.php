@@ -29,6 +29,9 @@ class App extends \Slim\App {
 		if(defined('IS_DEBUG')){
 			$settings['debug'] = IS_DEBUG;
 		}
+		if($settings['debug']){
+			$settings['displayErrorDetails'] = true;
+		}
 
 		if(!isset($settings['patternValidator'])){
 			$settings['patternValidator'] = function($pattern) {
