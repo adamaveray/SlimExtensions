@@ -9,6 +9,7 @@ use Slim\Http\Headers;
 use Slim\Http\Request as BaseRequest;
 use Slim\Http\Response as BaseResponse;
 use Whoops\Handler\PrettyPageHandler as WhoopsPrettyPageHandler;
+use Zeuxisoo\Whoops\Provider\Slim\WhoopsErrorHandler;
 use Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware;
 
 /**
@@ -59,6 +60,17 @@ class App extends \Slim\App {
 				// Import settings
 				$container['settings']['whoops.editor']		= [$legacyHandler, 'getEditorHref'];
 				$container['settings']['whoops.pageTitle']	= $legacyHandler->getPageTitle();
+			}
+
+			// Setup error handlers
+			$handler = function($container) {
+				return new WhoopsErrorHandler($container->get('whoops'));
+			};
+			if (!isset($container['errorHandler'])) {
+				$container['errorHandler'] = $handler;
+			}
+			if (!isset($container['phpErrorHandler'])) {
+				$container['phpErrorHandler'] = $handler;
 			}
 		}
 
