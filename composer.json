@@ -10,8 +10,10 @@
         }
     ],
     "require": {
-        "slim/slim": "^3.9",
-        "zeuxisoo/slim-whoops": "^0.6.1"
+        "php": ">=7.2",
+        "ext-json": "*",
+        "slim/slim": "^3.12",
+        "zeuxisoo/slim-whoops": "^0.6.3"
     },
     "autoload": {
         "psr-4": {
