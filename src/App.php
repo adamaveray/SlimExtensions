@@ -132,7 +132,7 @@ class App extends \Slim\App
         return self::setNameIfSet(parent::any($pattern, $callable ?? $callableOrName), $callableOrName);
     }
 
-    private static function setNameIfSet(RouteInterface $route, ?string $name): RouteInterface
+    private static function setNameIfSet(RouteInterface $route, $name): RouteInterface
     {
         if (\is_string($name)) {
             $route = $route->setName($name);
