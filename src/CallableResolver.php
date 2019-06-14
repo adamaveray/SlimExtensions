@@ -136,6 +136,12 @@ class CallableResolver implements CallableResolverInterface
         return function (...$args) use ($self, $callable) {
             [$app, $request, $response, $next, $params] = self::processArgs($args);
             $reflector = new \ReflectionFunction($callable);
+
+            if ($callable instanceof \Closure && $this !== $self) {
+                // Pass through binding
+                $callable = $callable->bindTo($this);
+            }
+
             return $self->invokeCallable($callable, $reflector, $request, $response, $next, $params);
         };
     }
