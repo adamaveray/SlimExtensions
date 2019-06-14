@@ -25,6 +25,7 @@ class CallableResolver implements CallableResolverInterface
     private const PARAM_REQUEST = 'request';
     private const PARAM_RESPONSE = 'response';
     private const PARAM_NEXT = 'next';
+    private const PARAM_ARGS = 'args';
 
     /** @var ContainerInterface $container */
     private $container;
@@ -86,8 +87,8 @@ class CallableResolver implements CallableResolverInterface
     {
         $self = $this;
 
-        return function (...$args) use ($self, $className, $methodStub, $isController) {
-            [$app, $request, $response, $next, $params] = self::processArgs($args);
+        return function (...$arguments) use ($self, $className, $methodStub, $isController) {
+            [$request, $response, $next, $args] = self::processRawArguments($arguments);
 
             // Validate method
             if ($isController) {
@@ -125,7 +126,7 @@ class CallableResolver implements CallableResolverInterface
                 throw new \BadMethodCallException('Method "' . $methodStub . '" is not callable on ' . $className);
             }
 
-            return $self->invokeCallable($callable, $reflector, $request, $response, $next, $params);
+            return $self->invokeCallable($callable, $reflector, $request, $response, $next, $args);
         };
     }
 
@@ -134,15 +135,22 @@ class CallableResolver implements CallableResolverInterface
         $self = $this;
 
         return function (...$args) use ($self, $callable) {
-            [$app, $request, $response, $next, $params] = self::processArgs($args);
-            $reflector = new \ReflectionFunction($callable);
+            [$request, $response, $next, $args] = self::processRawArguments($args);
+
+            if (\is_callable([$callable, '__invoke'])) {
+                // Invokable class instance
+                $reflector = new \ReflectionMethod($callable, '__invoke');
+            } else {
+                // Assume standard callable
+                $reflector = new \ReflectionFunction($callable);
+            }
 
             if ($callable instanceof \Closure && $this !== $self) {
                 // Pass through binding
                 $callable = $callable->bindTo($this);
             }
 
-            return $self->invokeCallable($callable, $reflector, $request, $response, $next, $params);
+            return $self->invokeCallable($callable, $reflector, $request, $response, $next, $args);
         };
     }
 
@@ -152,14 +160,14 @@ class CallableResolver implements CallableResolverInterface
         ?Request $request,
         ?Response $response,
         ?callable $next,
-        array $params = []
+        array $args = []
     ) {
         // Determine method dependencies
-        $dependencies = $this->getDependencies($reflector->getParameters(), $request, $response, $next, $params);
-        $args = array_merge($dependencies, [$request, $response, $params]);
+        $dependencies = $this->getDependencies($reflector->getParameters(), $request, $response, $next, $args);
+        $arguments = array_merge($dependencies, [$request, $response, $args]);
 
         // Pass-through method
-        return $callable(...$args);
+        return $callable(...$arguments);
     }
 
     /**
@@ -197,7 +205,7 @@ class CallableResolver implements CallableResolverInterface
      * @param Request|null $request
      * @param Response|null $response
      * @param callable|null $next
-     * @param array $params
+     * @param array $args
      * @return array
      */
     private function getDependencies(
@@ -205,12 +213,12 @@ class CallableResolver implements CallableResolverInterface
         ?Request $request,
         ?Response $response,
         ?callable $next,
-        array $params = []
+        array $args = []
     ): array {
         $dependencies = [];
 
         foreach ($parameters as $parameter) {
-            $dependencies[] = $this->resolveParameter($parameter, $request, $response, $next, $params);
+            $dependencies[] = $this->resolveParameter($parameter, $request, $response, $next, $args);
         }
 
         return $dependencies;
@@ -221,7 +229,7 @@ class CallableResolver implements CallableResolverInterface
      * @param Request|null $request
      * @param Response|null $response
      * @param callable|null $next
-     * @param array $params
+     * @param array $args
      * @return mixed
      */
     private function resolveParameter(
@@ -229,7 +237,7 @@ class CallableResolver implements CallableResolverInterface
         ?Request $request,
         ?Response $response,
         ?callable $next,
-        array $params = []
+        array $args = []
     ) {
         $parameterName = $parameter->name;
 
@@ -242,6 +250,9 @@ class CallableResolver implements CallableResolverInterface
         }
         if ($parameterName === self::PARAM_NEXT) {
             return $next;
+        }
+        if ($parameterName === self::PARAM_ARGS) {
+            return $args;
         }
 
         // Check request
@@ -272,7 +283,7 @@ class CallableResolver implements CallableResolverInterface
         if ($typehintClass !== null) {
             // Check params
             $typehintClassName = $typehintClass->name;
-            foreach ($params as $key => $param) {
+            foreach ($args as $key => $param) {
                 if (\is_object($param) && $param instanceof $typehintClassName) {
                     // Param matches
                     return $param;
@@ -296,12 +307,12 @@ class CallableResolver implements CallableResolverInterface
         throw new \RuntimeException('Cannot resolve parameter "' . $parameterName . '"');
     }
 
-    private static function processArgs(array $args): array
+    private static function processRawArguments(array $args): array
     {
         $app = $args[0] ?? null;
         if ($app instanceof App) {
             // Group call - no arguments
-            return [$app, null, null, null, [$app]];
+            return [null, null, null, [$app]];
         }
 
         [$request, $response, $nextOrParams] = $args;
@@ -315,6 +326,6 @@ class CallableResolver implements CallableResolverInterface
             $params = $nextOrParams;
         }
 
-        return [null, $request, $response, $next, $params];
+        return [$request, $response, $next, $params];
     }
 }
