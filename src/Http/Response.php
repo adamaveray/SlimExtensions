@@ -94,7 +94,7 @@ class Response extends \Slim\Http\Response
     /**
      * @param mixed $data      The API data to send
      * @param int|null $status A different HTTP status code to use
-     * @return Response
+     * @return static
      */
     public function withApi($data, ?int $status = null): self
     {
@@ -107,7 +107,7 @@ class Response extends \Slim\Http\Response
      * @param array|null $extraData            Additional data to include in the response body
      * @param string $debugMessage             A message to be displayed in debug environments
      * @param array|\Throwable|null $debugData Additional debug data
-     * @return Response
+     * @return static
      */
     public function withApiError(
         string $error,
@@ -123,7 +123,7 @@ class Response extends \Slim\Http\Response
     /**
      * @param string $debugMessage             A message to be displayed in debug environments
      * @param array|\Throwable|null $debugData Additional debug data
-     * @return Response
+     * @return static
      */
     public function withNotFound(string $debugMessage, $debugData = null): self
     {
@@ -166,7 +166,7 @@ class Response extends \Slim\Http\Response
      * (For subclassing)
      *
      * @param Response $response
-     * @return Response
+     * @return static
      */
     protected function getNotFoundResponse(Response $response): Response
     {
