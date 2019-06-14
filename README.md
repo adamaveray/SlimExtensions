@@ -36,13 +36,15 @@ The arguments to a route function (e.g. `->get('/', function(...) {})`) or middl
 
 2. In middleware, `$next` will receive the next-callable
 
-3. If an attribute on the Request object matches the argument name it will be used
+3. In routes, `$args` will receive the default array of request arguments
 
-4. If an argument on the Route object matches the argument name it will be used
+4. If an attribute on the Request object matches the argument name it will be used
 
-5. If an item in the Container matches the argument name it will be used
+5. If an argument on the Route object matches the argument name it will be used
 
-6. If the argument has a class typehint a new instance of the class will be instantiated (which will in turn have its constructor arguments injected using these same rules)
+6. If an item in the Container matches the argument name it will be used
+
+7. If the argument has a class typehint a new instance of the class will be instantiated (which will in turn have its constructor arguments injected using these same rules)
 
 If no dependency is matched, the argument default value will be used if available, otherwise an exception will be thrown.
 
