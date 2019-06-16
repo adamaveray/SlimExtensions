@@ -44,8 +44,6 @@ The arguments to a route function (e.g. `->get('/', function(...) {})`) or middl
 
 6. If an item in the Container matches the argument name it will be used
 
-7. If the argument has a class typehint a new instance of the class will be instantiated (which will in turn have its constructor arguments injected using these same rules)
-
 If no dependency is matched, the argument default value will be used if available, otherwise an exception will be thrown.
 
 #### Class Route/Middleware Handlers

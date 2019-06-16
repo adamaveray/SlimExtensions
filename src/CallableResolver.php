@@ -289,9 +289,6 @@ class CallableResolver implements CallableResolverInterface
                     return $param;
                 }
             }
-
-            // Attempt to instantiate new instance
-            return $this->resolveClass($typehintClassName);
         }
 
         // Use default value if available
