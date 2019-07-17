@@ -22,6 +22,7 @@ class CallableResolver implements CallableResolverInterface
 {
     private const ENDPOINT_PREFIX_METHOD = 'endpoint';
     private const ENDPOINT_PREFIX_MIDDLEWARE = 'middleware';
+    private const PARAM_CONTAINER = 'container';
     private const PARAM_REQUEST = 'request';
     private const PARAM_RESPONSE = 'response';
     private const PARAM_NEXT = 'next';
@@ -243,6 +244,8 @@ class CallableResolver implements CallableResolverInterface
 
         // Handle default params
         switch ($parameterName) {
+            case self::PARAM_CONTAINER:
+                return $this->container;
             case self::PARAM_REQUEST:
                 return $request ?? $this->container->get('request');
             case self::PARAM_RESPONSE:
