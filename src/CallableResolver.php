@@ -242,17 +242,15 @@ class CallableResolver implements CallableResolverInterface
         $parameterName = $parameter->name;
 
         // Handle default params
-        if ($parameterName === self::PARAM_REQUEST) {
-            return $request ?? $this->container->get('request');
-        }
-        if ($parameterName === self::PARAM_RESPONSE) {
-            return $response ?? $this->container->get('response');
-        }
-        if ($parameterName === self::PARAM_NEXT) {
-            return $next;
-        }
-        if ($parameterName === self::PARAM_ARGS) {
-            return $args;
+        switch ($parameterName) {
+            case self::PARAM_REQUEST:
+                return $request ?? $this->container->get('request');
+            case self::PARAM_RESPONSE:
+                return $response ?? $this->container->get('response');
+            case self::PARAM_NEXT:
+                return $next;
+            case self::PARAM_ARGS:
+                return $args;
         }
 
         // Check request
