@@ -240,7 +240,7 @@ class App extends \Slim\App
      * @return RouteInterface|RouteInterface[]
      * @throws \InvalidArgumentException A pattern does not pass the defined pattern validator
      */
-    public function map(array $methods, $patterns, $callable)
+    public function map(array $methods, $patterns, $callableOrName, $callable = null): RouteInterface
     {
         try {
             $validator = $this->getContainer()->get('patternValidator');
@@ -254,7 +254,10 @@ class App extends \Slim\App
                 throw new \InvalidArgumentException('Pattern is invalid (' . $pattern . ')');
             }
 
-            $routes[$i] = parent::map($methods, $pattern, $callable);
+            $routes[$i] = self::setNameIfSet(
+                parent::map($methods, $pattern, $callable ?? $callableOrName),
+                $callableOrName
+            );
         }
 
         if (\is_array($patterns)) {
