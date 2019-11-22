@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8a066b17956082daf79e48c803edbc4",
+    "content-hash": "2887f3eb440d1b8186c2264b41dff218",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -414,61 +414,6 @@
                 "router"
             ],
             "time": "2019-08-20T18:46:05+00:00"
-        },
-        {
-            "name": "zeuxisoo/slim-whoops",
-            "version": "0.7.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zeuxisoo/php-slim-whoops.git",
-                "reference": "34a0dd3f0b3f17726083f5f6c8676f65553af7b7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zeuxisoo/php-slim-whoops/zipball/34a0dd3f0b3f17726083f5f6c8676f65553af7b7",
-                "reference": "34a0dd3f0b3f17726083f5f6c8676f65553af7b7",
-                "shasum": ""
-            },
-            "require": {
-                "filp/whoops": "^2.3",
-                "php": "^7.1"
-            },
-            "require-dev": {
-                "equip/dispatch": "^2.0",
-                "phpunit/phpunit": "^7.5",
-                "slim/http": "0.8",
-                "slim/psr7": "0.6.*",
-                "slim/slim": "4.3.*",
-                "slim/twig-view": "dev-master#472f2c1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Zeuxisoo\\Whoops\\Slim\\": "src/Zeuxisoo/Whoops/Slim",
-                    "Zeuxisoo\\Whoops\\Slim\\Tests\\": "tests"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Zeuxis Lo",
-                    "email": "seekstudio@gmail.com",
-                    "homepage": "http://www.not.im/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP whoops error on slim framework",
-            "homepage": "https://github.com/zeuxisoo/php-slim-whoops/",
-            "keywords": [
-                "error",
-                "exception",
-                "slim",
-                "whoops"
-            ],
-            "time": "2019-11-21T12:56:35+00:00"
         }
     ],
     "packages-dev": [],
@@ -481,5 +426,8 @@
         "php": ">=7.2",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "7.3.0"
+    }
 }

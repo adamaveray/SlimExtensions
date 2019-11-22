@@ -14,9 +14,7 @@ use Slim\Interfaces\RouteInterface;
 use Slim\Http\Headers;
 use Slim\Http\Request as BaseRequest;
 use Slim\Http\Response as BaseResponse;
-use Whoops\Handler\PrettyPageHandler as WhoopsPrettyPageHandler;
-use Zeuxisoo\Whoops\Provider\Slim\WhoopsErrorHandler;
-use Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware;
+use Whoops\Handler as WhoopsHandler;
 
 /**
  * @method RouteGroup group(string $pattern, callable $callable)
@@ -39,16 +37,6 @@ class App extends \Slim\App
                 'attributes' => array_keys($request->getAttributes()),
             ]);
         });
-
-        $container['errorHandler'] = $container['debug']
-            ? null
-            : static function (Container $container): callable {
-                return static function (Request $_1, Response $_2, \Throwable $exception) use ($container): void {
-                    echo $container->whoops->handleException($exception);
-                    exit();
-                };
-            };
-        $container['phpErrorHandler'] = $container['errorHandler'];
 
         $container['callableResolver'] =
             $container['callableResolver'] ??
@@ -167,28 +155,41 @@ class App extends \Slim\App
     {
         /** @var \Whoops\Run $whoops */
         $whoops = self::getFromContainer($container, 'whoops');
+        if ($whoops === null) {
+            return;
+        }
 
-        // Import handlers from given Whoops instance
-        $handlers = self::getFromContainer($container, 'whoops.handlers') ?? [];
-        if ($whoops !== null) {
-            $handlers = $whoops->getHandlers();
-            if (isset($handlers[0]) && $handlers[0] instanceof WhoopsPrettyPageHandler) {
-                // Remove original PrettyPageHandler
-                /** @var WhoopsPrettyPageHandler $legacyHandler */
-                $legacyHandler = array_shift($handlers);
+        $isDebug = $container['debug'];
 
-                // Import settings
-                $container['settings']['whoops.editor'] = [$legacyHandler, 'getEditorHref'];
-                $container['settings']['whoops.pageTitle'] = $legacyHandler->getPageTitle();
+        // Check for existing PrettyPageHandler
+        $prettyPageHandler = null;
+        $handlers = $whoops->getHandlers();
+        foreach ($whoops->getHandlers() as $handler) {
+            if ($handler instanceof WhoopsHandler\PrettyPageHandler) {
+                $prettyPageHandler = $handler;
+                break;
             }
         }
 
-        $this->add(new WhoopsMiddleware($this, $handlers));
-
         // Setup error handlers
-        $handler = static function (Container $container): WhoopsErrorHandler {
-            return new WhoopsErrorHandler($container['whoops']);
+        $handler = static function (Container $container) use ($prettyPageHandler): callable {
+            /** @var \Whoops\Run $whoops */
+            $whoops = $container['whoops'];
+
+            return static function (Request $request, ResponseInterface $_, $error) use (
+                $whoops,
+                $prettyPageHandler
+            ): void {
+                if ($prettyPageHandler !== null) {
+                    // Add more information to the PrettyPageHandler
+                    self::configureWhoopsPrettyPageHandler($prettyPageHandler, $request);
+                }
+
+                $whoops->handleException($error);
+                exit();
+            };
         };
+
         if (!isset($container['errorHandler'])) {
             $container['errorHandler'] = $handler;
         }
@@ -373,5 +374,35 @@ class App extends \Slim\App
         }
 
         return $value;
+    }
+
+    /**
+     * @param WhoopsHandler\PrettyPageHandler $handler The handler to bind update
+     * @param Request $request The current request
+     */
+    private static function configureWhoopsPrettyPageHandler(
+        WhoopsHandler\PrettyPageHandler $handler,
+        Request $request
+    ): void {
+        $emptyValue = '<none>';
+
+        $contentCharset = $emptyValue;
+        if ($request instanceof \Slim\Http\Request && $request->getContentCharset() !== null) {
+            $contentCharset = $request->getContentCharset();
+        }
+
+        $handler->addDataTable('Slim Application', [
+            'Version' => self::VERSION,
+            'Accept Charset' => $request->getHeader('ACCEPT_CHARSET') ?: $emptyValue,
+            'Content Charset' => $contentCharset,
+            'HTTP Method' => $request->getMethod(),
+            'Path' => $request->getUri()->getPath(),
+            'Query String' => $request->getUri()->getQuery() ?: $emptyValue,
+            'Base URL' => (string) $request->getUri(),
+            'Scheme' => $request->getUri()->getScheme(),
+            'Port' => $request->getUri()->getPort(),
+            'Host' => $request->getUri()->getHost(),
+            'Request Attributes' => $request->getAttributes() ?: $emptyValue,
+        ]);
     }
 }
