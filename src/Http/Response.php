@@ -198,7 +198,7 @@ class Response extends \Slim\Http\Response
                 'code' => $exception->getCode(),
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'trace' => $exception->getTrace(),
+                'trace' => explode("\n", $exception->getTraceAsString()),
             ];
         }
 
