@@ -266,8 +266,16 @@ class CallableResolver implements CallableResolverInterface
         }
 
         // Check route
+        $route = null;
         if ($next instanceof RouteInterface) {
-            $argument = $next->getArgument($parameterName);
+            // Raw route given
+            $route = $next;
+        } elseif ($next instanceof \Closure) {
+            // Closure given - assumed route bound as `$this`
+            $route = (new \ReflectionFunction($next))->getClosureThis();
+        }
+        if ($route instanceof RouteInterface) {
+            $argument = $route->getArgument($parameterName);
             if ($argument !== null) {
                 // Found in route
                 return $argument;
