@@ -224,11 +224,13 @@ class App extends \Slim\App
             $headers = new Headers(['Content-Type' => 'text/html; charset=UTF-8']);
             $className = $container['settings']['responseClass'];
             /** @var ResponseInterface $response */
-            $response = new $className(StatusCode::HTTP_OK, $headers);
-            if ($response instanceof Response) {
-                // Set custom extensions
+            if (is_a($className, Response::class, true)) {
+                // Custom subclass
+                $response = new $className(StatusCode::HTTP_OK, $headers, null, $container);
                 $response->setIsDebug($container['debug']);
-                $response->setContainer($container);
+            } else {
+                // Assume generic Response class
+                $response = new $className(StatusCode::HTTP_OK, $headers);
             }
             return $response->withProtocolVersion($container['settings']['httpVersion']);
         };

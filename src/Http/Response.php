@@ -4,13 +4,24 @@ declare(strict_types=1);
 namespace AdamAveray\SlimExtensions\Http;
 
 use AdamAveray\SlimExtensions\Container;
-use Psr\Container\ContainerInterface;
+use Psr\Http\Message\StreamInterface;
 use Slim\Http\StatusCode;
+use Slim\Interfaces\Http\HeadersInterface;
 
 class Response extends \Slim\Http\Response
 {
     protected bool $isDebug = false;
-    protected ?Container $container = null;
+    protected Container $container;
+
+    public function __construct($status = StatusCode::HTTP_OK, HeadersInterface $headers = null, StreamInterface $body = null, ?Container $container = null)
+    {
+        if ($container === null) {
+            throw new \BadMethodCallException('Container must be set');
+        }
+        $this->container = $container;
+
+        parent::__construct($status, $headers, $body);
+    }
 
     /**
      * @param bool $isDebug
@@ -19,12 +30,6 @@ class Response extends \Slim\Http\Response
     public function setIsDebug(bool $isDebug): self
     {
         $this->isDebug = $isDebug;
-        return $this;
-    }
-
-    public function setContainer(Container $container): self
-    {
-        $this->container = $container;
         return $this;
     }
 
