@@ -6,7 +6,7 @@ namespace AdamAveray\SlimExtensions;
 use AdamAveray\SlimExtensions\Http\Response;
 use AdamAveray\SlimExtensions\Routes\Controller;
 use AdamAveray\SlimExtensions\Routes\ControllerInterface;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Interfaces\CallableResolverInterface;
