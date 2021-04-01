@@ -29,9 +29,9 @@ class CallableResolver implements CallableResolverInterface
     private const PARAM_ARGS = 'args';
 
     /** @var ContainerInterface $container */
-    private $container;
-    /** @var object[] $instances */
-    private $instances = [];
+    private ContainerInterface $container;
+    /** @var array<string, object> $instances */
+    private array $instances = [];
 
     /**
      * @param ContainerInterface $container

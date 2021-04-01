@@ -16,14 +16,20 @@ class NamespacedMiddleware
     private const PATTERN_PLACEHOLDERS = '~\\\\{.*?(?:\\:(.*))?\\\\}~';
 
     /** @var Container $container */
-    private $container;
+    private Container $container;
     /** @var array $pattern */
-    private $pattern;
+    private array $pattern;
     /** @var mixed $middleware */
     private $middleware;
     /** @var array[] $excludedPaths */
-    private $excludedPaths;
+    private array $excludedPaths;
 
+    /**
+     * @param Container $container
+     * @param string $pattern
+     * @param mixed $middleware
+     * @param array|null $excludedPaths
+     */
     public function __construct(Container $container, string $pattern, $middleware, ?array $excludedPaths = null)
     {
         $this->container = $container;

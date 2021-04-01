@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace AdamAveray\SlimExtensions\Http;
 
+use AdamAveray\SlimExtensions\Container;
 use Psr\Container\ContainerInterface;
 use Slim\Http\StatusCode;
 
 class Response extends \Slim\Http\Response
 {
-    protected $isDebug = false;
-    protected $container;
+    protected bool $isDebug = false;
+    protected ?Container $container = null;
 
     /**
      * @param bool $isDebug
@@ -21,11 +22,7 @@ class Response extends \Slim\Http\Response
         return $this;
     }
 
-    /**
-     * @param array|ContainerInterface $container
-     * @return Response
-     */
-    public function setContainer($container): self
+    public function setContainer(Container $container): self
     {
         $this->container = $container;
         return $this;

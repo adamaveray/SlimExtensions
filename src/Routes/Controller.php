@@ -8,10 +8,10 @@ use Slim\Http\Request;
 
 abstract class Controller implements ControllerInterface
 {
-    /** @var Request $request */
-    protected $request;
-    /** @var Response $response */
-    protected $response;
+    /** @var Request|null $request */
+    protected ?Request $request = null;
+    /** @var Response|null $response */
+    protected ?Response $response = null;
 
     public function setRequestResponse(Request $request, Response $response): void
     {

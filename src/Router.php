@@ -5,8 +5,13 @@ namespace AdamAveray\SlimExtensions;
 
 class Router extends \Slim\Router
 {
-    private $defaultUrlSegments = [];
+    /** @var array<string, mixed> */
+    private array $defaultUrlSegments = [];
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
     public function setDefaultUrlSegment(string $key, $value): void
     {
         $this->defaultUrlSegments[$key] = $value;

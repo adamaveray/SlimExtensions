@@ -9,10 +9,11 @@ use Slim\Interfaces\RouteInterface;
 
 class RouteGroup extends \Slim\RouteGroup
 {
-    private $isBound = false;
-    private $converters = [];
+    private bool $isBound = false;
+    /** @var array<string, array{callable: callable, ignoreNull: bool, required: bool}>  */
+    private array $converters = [];
     /** @var App|null $app */
-    private $app;
+    private ?App $app;
 
     public function __invoke(\Slim\App $app = null)
     {
