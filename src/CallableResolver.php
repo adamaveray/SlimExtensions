@@ -288,10 +288,10 @@ class CallableResolver implements CallableResolverInterface
             return $this->container->get($parameterName);
         }
 
-        $typehintClass = $parameter->getClass();
-        if ($typehintClass !== null) {
+        $typehintType = $parameter->getType();
+        if ($typehintType instanceof \ReflectionNamedType) {
             // Check params
-            $typehintClassName = $typehintClass->name;
+            $typehintClassName = $typehintType->getName();
             foreach ($args as $key => $param) {
                 if (\is_object($param) && $param instanceof $typehintClassName) {
                     // Param matches
