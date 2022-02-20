@@ -13,7 +13,7 @@
         "php": ">=7.4",
         "ext-json": "*",
         "slim/slim": "^3.12",
-        "filp/whoops": "^2.5",
+        "filp/whoops": "^2.15",
         "psr/container": "^1.0 || ^2.0"
     },
     "autoload": {
