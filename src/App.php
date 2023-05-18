@@ -73,9 +73,12 @@ class App extends \Slim\App
         if ($callable === null) {
             $callable = $patternOrCallable;
         } else {
+            /** @var Router $router */
+            $router = $this->getContainer()->get('router');
+            $pattern = $router->prefixPattern($patternOrCallable);
             $callable = new NamespacedMiddleware(
                 $this->getContainer(),
-                $patternOrCallable,
+                $pattern,
                 $callable,
                 $excludedPatterns
             );

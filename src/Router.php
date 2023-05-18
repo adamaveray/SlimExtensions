@@ -29,4 +29,12 @@ class Router extends \Slim\Router
         $data = array_merge($this->defaultUrlSegments, $data);
         return parent::relativePathFor($name, $data, $queryParams);
     }
+
+    /**
+     * @param string $pattern A relative pattern
+     * @return string An absolute pattern with group patterns prefixed
+     */
+    public function prefixPattern(string $pattern): string {
+        return $this->processGroups() . $pattern;
+    }
 }
